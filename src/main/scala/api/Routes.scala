@@ -9,16 +9,11 @@ import domain.UrlFacade
 import domain.models.{OriginalUrl, ShortCode}
 
 class Routes(urlFacade: UrlFacade) {
-
-  val routes: Route = {
-    pathPrefix("api") {
-      shortenRoute
-    } ~ redirectRoute  // Redirect at root level, not under /api
-  }
-
-
+  
+  lazy val routes: Route = shortenRoute ~ redirectRoute
+  
   private val shortenRoute: Route = {
-    path("shorten") {
+    path("api" / "shorten") {
       post {
         entity(as[ShortenRequest]) { request =>
           val originalUrl: OriginalUrl = OriginalUrl(request.url)
@@ -40,7 +35,6 @@ class Routes(urlFacade: UrlFacade) {
     path(Segment) { shortCode =>
       get {
         val code = ShortCode(shortCode)
-
         urlFacade.redirect(code) match {
           case Some(originalUrl) =>
             println(s"DEBUG: Redirecting to: '${originalUrl.value}'")
