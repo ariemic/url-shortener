@@ -1,4 +1,5 @@
 # URL Shortener - Requirements & Learning Guide
+https://codefarm0.medium.com/designing-a-url-shortener-tinyurl-cb3bcfe79dd2
 
 ## Functional Requirements
 
