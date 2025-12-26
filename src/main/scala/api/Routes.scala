@@ -1,30 +1,28 @@
 package api
 
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
+import akka.http.scaladsl.model.{StatusCodes, Uri}
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import domain.UrlMapper
-import domain.models.OriginalUrl
-import api.JsonProtocol._
+import api.JsonProtocol.*
+import domain.UrlFacade
+import domain.models.{OriginalUrl, ShortCode}
 
-class Routes(urlMapper: UrlMapper) {
+class Routes(urlFacade: UrlFacade) {
 
   val routes: Route = {
     pathPrefix("api") {
-      shortenRoute ~ redirectRoute
-    }
+      shortenRoute
+    } ~ redirectRoute  // Redirect at root level, not under /api
   }
 
-  // POST /api/shorten
-  // Body: { "url": "https://google.com" }
-  // Response: { "shortCode": "abc123", "originalUrl": "https://google.com", "shortUrl": "http://localhost:8080/abc123" }
+
   private val shortenRoute: Route = {
     path("shorten") {
       post {
         entity(as[ShortenRequest]) { request =>
           val originalUrl: OriginalUrl = OriginalUrl(request.url)
-          val result = urlMapper.shorten(originalUrl)
+          val result = urlFacade.shorten(originalUrl)
           result match {
             case Right(mappedUrl) =>
               complete(StatusCodes.OK, toShortenResponse(mappedUrl))
@@ -41,17 +39,16 @@ class Routes(urlMapper: UrlMapper) {
   private val redirectRoute: Route = {
     path(Segment) { shortCode =>
       get {
-        // TODO:
-        // 1. Look up the original URL using urlMapper or repository
-        
-        // 2. If found, redirect (301 or 302)
-        // 3. If not found, return 404
+        val code = ShortCode(shortCode)
 
-        // Hint: You might need to inject repository into Routes
-        // Hint: Use redirect(originalUrl, StatusCodes.PermanentRedirect)
-        
-
-        complete(StatusCodes.NotImplemented, ErrorResponse("Redirect not implemented yet"))
+        urlFacade.redirect(code) match {
+          case Some(originalUrl) =>
+            println(s"DEBUG: Redirecting to: '${originalUrl.value}'")
+            redirect(Uri(originalUrl.value), StatusCodes.PermanentRedirect)
+          case None =>
+            println(s"DEBUG: Short code not found: '$shortCode'")
+            complete(StatusCodes.NotFound, ErrorResponse("Short code not found"))
+        }
       }
     }
   }

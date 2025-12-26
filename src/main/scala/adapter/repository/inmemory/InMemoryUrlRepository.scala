@@ -12,7 +12,8 @@ class InMemoryUrlRepository extends UrlRepository{
   override def save(mappedUrl: MappedUrl): Unit =
     storage += (mappedUrl.shortCode -> mappedUrl)
 
-  override def findByShortCode(code: ShortCode): Option[MappedUrl] = storage.get(code)
+  override def findByShortCode(code: ShortCode): Option[MappedUrl] =
+    storage.get(code)
 
   override def findByOriginalUrl(originalUrl: OriginalUrl): Option[MappedUrl] = {
    storage.values.find(_.originalUrl == originalUrl)

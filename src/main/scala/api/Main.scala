@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
 // Domain imports
-import domain.{UrlMapper, ShortCodeGenerator, UrlRepository}
+import domain.{UrlFacade, UrlMapper, ShortCodeGenerator, UrlRepository}
 import adapter.generator.RandomShortCodeGenerator
 import adapter.repository.inmemory.InMemoryUrlRepository
 
@@ -22,7 +22,8 @@ object Main extends App {
   val generator: ShortCodeGenerator = new RandomShortCodeGenerator()
   val repository: UrlRepository = new InMemoryUrlRepository()
   val urlMapper: UrlMapper = new UrlMapper(generator, repository)
-  val routes: Route = new Routes(urlMapper).routes
+  val urlFacade: UrlFacade = new UrlFacade(urlMapper, repository)
+  val routes: Route = new Routes(urlFacade).routes
 
   // Start the HTTP server
   val host = "localhost"
