@@ -1,6 +1,6 @@
 package api
 
-import adapter.generator.HashBasedShortCodeGenerator
+import adapter.generator.{Base62ShortCodeGenerator, HashBasedShortCodeGenerator}
 import adapter.repository.inmemory.InMemoryUrlRepository
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -17,7 +17,7 @@ object Main extends App {
   implicit val executionContext: ExecutionContextExecutor = system.executionContext
 
   // Wire up your dependencies (Dependency Injection)
-  val generator: ShortCodeGenerator = new HashBasedShortCodeGenerator()
+  val generator: ShortCodeGenerator = new Base62ShortCodeGenerator()
   val repository: UrlRepository = new InMemoryUrlRepository()
   val urlMapper: UrlMapper = new UrlMapper(generator, repository)
   val urlFacade: UrlFacade = new UrlFacade(urlMapper, repository)
