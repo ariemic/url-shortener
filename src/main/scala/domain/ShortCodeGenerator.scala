@@ -1,7 +1,7 @@
 package domain
 
-import domain.models.ShortCode
+import domain.models.{OriginalUrl, ShortCode}
 
 trait ShortCodeGenerator {
-  def generate(): ShortCode 
+  def generate(url: Option[OriginalUrl] = None): ShortCode
 }

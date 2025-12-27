@@ -1,25 +1,23 @@
 package api
 
+import adapter.generator.HashBasedShortCodeGenerator
+import adapter.repository.inmemory.InMemoryUrlRepository
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
+import domain.{ShortCodeGenerator, UrlFacade, UrlMapper, UrlRepository}
+
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
-// Domain imports
-import domain.{UrlFacade, UrlMapper, ShortCodeGenerator, UrlRepository}
-import adapter.generator.RandomShortCodeGenerator
-import adapter.repository.inmemory.InMemoryUrlRepository
-
 object Main extends App {
 
-  // Create the actor system
   implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "url-shortener-system")
   implicit val executionContext: ExecutionContextExecutor = system.executionContext
 
   // Wire up your dependencies (Dependency Injection)
-  val generator: ShortCodeGenerator = new RandomShortCodeGenerator()
+  val generator: ShortCodeGenerator = new HashBasedShortCodeGenerator()
   val repository: UrlRepository = new InMemoryUrlRepository()
   val urlMapper: UrlMapper = new UrlMapper(generator, repository)
   val urlFacade: UrlFacade = new UrlFacade(urlMapper, repository)

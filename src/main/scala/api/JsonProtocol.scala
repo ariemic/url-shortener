@@ -1,7 +1,7 @@
 package api
 
-import spray.json._
-import domain.models.{MappedUrl, OriginalUrl, ShortCode}
+import domain.models.MappedUrl
+import spray.json.*
 
 
 case class ShortenRequest(url: String)

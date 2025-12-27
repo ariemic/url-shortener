@@ -1,9 +1,15 @@
 package adapter.generator
 
 import domain.ShortCodeGenerator
-import domain.models.ShortCode
+import domain.models.{OriginalUrl, ShortCode}
 
-class Base62ShortCodeGenerator extends ShortCodeGenerator{
+import java.util.concurrent.atomic.AtomicLong
 
-  override def generate(): ShortCode = ???
+class Base62ShortCodeGenerator extends ShortCodeGenerator {
+  private val counter = new AtomicLong(0)
+
+  override def generate(url: Option[OriginalUrl] = None): ShortCode = {
+    val id = counter.incrementAndGet()
+    ShortCode(Base62Encoder.encode(id))  
+  }
 }
