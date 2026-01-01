@@ -1,5 +1,4 @@
-package adapter.repository.h2
-
+package adapter.repository.db.doobie
 import cats.effect.IO
 import cats.implicits.*
 import doobie.*
@@ -8,7 +7,7 @@ import pureconfig.{ConfigReader, ConfigSource}
 
 import scala.io.Source
 
-case class DatabaseH2Config(
+case class DoobieConfig(
                            driver: String,
                            url: String,
                            user: String,
@@ -18,10 +17,10 @@ case class DatabaseH2Config(
                          ) derives ConfigReader
 
 
-object DatabaseH2Config {
+object DoobieConfig {
 
-  def load: DatabaseH2Config =
-    ConfigSource.default.at("database").loadOrThrow[DatabaseH2Config]
+  def load: DoobieConfig =
+    ConfigSource.default.at("database").loadOrThrow[DoobieConfig]
 
   def initialize(xa: Transactor[IO], schemaPath: String): IO[Unit] = {
     IO {

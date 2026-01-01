@@ -1,7 +1,7 @@
 package api
 
 import adapter.generator.Base62ShortCodeGenerator
-import adapter.repository.h2.{DatabaseH2Config, DbH2UrlRepository}
+import adapter.repository.db.doobie.{DoobieConfig, DoobieUrlRepository}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
@@ -22,7 +22,7 @@ object Main extends App {
 
   // Initialize database
   println("🗄️  Initializing database...")
-  val config = DatabaseH2Config.load
+  val config = DoobieConfig.load
   
   val xa: Transactor[IO] = H2Transactor.newH2Transactor[IO](
     url = config.url,
@@ -31,7 +31,7 @@ object Main extends App {
     connectEC = ExecutionContext.global
   ).allocated.unsafeRunSync()._1
 
-  DatabaseH2Config.initialize(xa, config.schema).unsafeRunSync()
+  DoobieConfig.initialize(xa, config.schema).unsafeRunSync()
   
   println("✅ Database initialized!")
 
@@ -39,7 +39,7 @@ object Main extends App {
   val generator: ShortCodeGenerator = new Base62ShortCodeGenerator()
 
   // Phase 3: Use database repository instead of in-memory
-  val repository: UrlRepository = new DbH2UrlRepository(xa)
+  val repository: UrlRepository = new DoobieUrlRepository(xa)
   // val repository: UrlRepository = new InMemoryUrlRepository()  // Phase 1/2
 
   val urlMapper: UrlMapper = new UrlMapper(generator, repository)
