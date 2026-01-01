@@ -168,7 +168,7 @@ This teaches you: Exhaustiveness checking, destructuring, control flow
 - Connection pooling
 - Transaction handling
 
-**Scala concepts**: IO monad, resource management, database librariesrefers to CompiledExpression/T in package api which is not available.
+**Scala concepts**: IO monad, resource management, database libraries refers to CompiledExpression/T in package api which is not available.
 
 ### Phase 4: Add Features
 - Custom aliases
